@@ -11,7 +11,21 @@ const quotes = [
     const randomQuote = quotes[randomIndex];
 
     const displayQuotes = document.getElementById('quoteDisplay');
-    displayQuotes.innerHTML = `<p>${randomQuote.text}</p><p><em>Category: ${randomQuote.category}</em></p>`;
+
+    //clear any previous quotes
+    displayQuotes.innerHTML = '';
+
+    //create new paragraph element for the quotes
+    const quoteTextElement = document.createElement('p');
+    quoteTextElement.textContent = randomQuote.text;
+
+    //create new paragraph element for the category
+    const quoteCategoryElement = document.createElement('p');
+    quoteCategoryElement.innerHTML = `<em>Category: ${randomQuote.category}</em>`;
+
+    //append element to disaplayQuote function
+    displayQuotes.appendChild(quoteTextElement);
+    displayQuotes.appendChild(quoteCategoryElement);
   }
 
   //add event listener to show random quotes

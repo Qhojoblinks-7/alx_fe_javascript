@@ -74,15 +74,59 @@ function reset() {
     document.getElementById('newQuoteCategory').value = '';
 }
 
+
+// function to import file from JSON
 function importFromJsonFile(event) {
-  const fileReader = new FileReader();
-  fileReader.onload = function(event) {
-    const importedQuotes = JSON.parse(event.target.result);
-    quotes.push(...importedQuotes);
-    saveQuotes();
-    alert('Quotes imported successfully!');
+
+   //get uploaded file
+  const file = event.target.files[0];
+  const reader = new FileReader();
+
+  // function to be executed once file is read
+  reader.onload = function(event) {
+
+    try{
+      const importedQuotes = JSON.parse(event.target.result);
+      // verify if imported quotes are arrays
+
+      if(Array.isArray(importedQuotes) && importedQuotes.every(quotes=>quotes.text && quotes.category)){
+        
+      quotes.push(...importedQuotes);//add quotes to existing array
+
+      localStorage('quotes', JSON.stringify(quotes)); //update storagde
+      saveQuotes();
+      alert('Quotes imported successfully!');
+      }else{
+        alert('Invalid format')
+      }
+      
+    }catch{
+      alert('Error parsing the file')
+    }
+    
   };
-  fileReader.readAsText(event.target.files[0]);
+
+  if(file){
+    fileReader.readAsText(file);
+  }
 }
 
+document.getElementById('importQuotesFile').addEventListener('click', importFromJsonFile);
+
+//function to export file to a json file
+function exportToJSONFile(){
+  const dataString = JSON.stringify(quotes, null, 2);
+  const dataUri = 'data:application/json;charset=utf-8'+ encodeURIComponent(dataString);
+
+  //default file name
+  const exportDefaultFileName = 'quotes.json';
+
+  const linkElement = document.createElement('a');
+  linkElement.setAttribute('href', dataString);
+  linkElement.setAttribute('download', exportDefaultFileName);
+  linkElement.click(); //automatically click the link to trigger download
+}
+
+
+document.getElementById('exportQuote').addEventListener('click', exportToJSONFile);
 

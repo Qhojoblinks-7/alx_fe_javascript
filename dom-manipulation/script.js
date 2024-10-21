@@ -113,20 +113,27 @@ function importFromJsonFile(event) {
 
 document.getElementById('importQuotesFile').addEventListener('click', importFromJsonFile);
 
-//function to export file to a json file
-function exportToJSONFile(){
-  const dataString = JSON.stringify(quotes, null, 2);
-  const dataUri = 'data:application/json;charset=utf-8'+ encodeURIComponent(dataString);
+// Function to export quotes to a JSON file using Blob
+function exportToJsonFile() {
+  const dataStr = JSON.stringify(quotes, null, 2); // Convert quotes array to JSON
 
-  //default file name
-  const exportDefaultFileName = 'quotes.json';
+  // Create a new Blob object using the JSON string
+  const blob = new Blob([dataStr], { type: 'application/json' });
 
+  // Create a URL for the Blob and attach it to an <a> element
+  const url = URL.createObjectURL(blob);
+
+  // Create an <a> element programmatically
   const linkElement = document.createElement('a');
-  linkElement.setAttribute('href', dataString);
-  linkElement.setAttribute('download', exportDefaultFileName);
-  linkElement.click(); //automatically click the link to trigger download
+  linkElement.href = url; // Set the Blob URL as the href attribute
+  linkElement.download = 'quotes.json'; // Set the download attribute with the desired file name
+
+  // Trigger the download by programmatically clicking the <a> element
+  linkElement.click();
+
+  // Clean up by revoking the Blob URL
+  URL.revokeObjectURL(url);
 }
 
-
-document.getElementById('exportQuote').addEventListener('click', exportToJSONFile);
-
+// Add event listener to the export button
+document.getElementById('exportQuotes').addEventListener('click', exportToJsonFile);

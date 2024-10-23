@@ -360,7 +360,7 @@ function resolveConflictsAndMergeQuotes(serverQuotes) {
 
   quotes = Array.from(existingQuotesMap.values());
   localStorage.setItem('quotes', JSON.stringify(quotes));
-  showNotification('Quotes synchronized with server!');
+  showNotification('Quotes synced with server');
 }
 
 // Simulated server interaction

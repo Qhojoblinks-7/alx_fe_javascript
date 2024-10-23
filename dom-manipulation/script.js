@@ -260,16 +260,37 @@ function showRandomQuote() {
 document.getElementById('newQuote').addEventListener('click', showRandomQuote);
 
 // Function to create and add new quotes
-function createAddQuoteForm() {
+async function createAddQuoteForm() {
   const inputQuote = document.getElementById('newQuoteText').value.trim();
   const inputCategory = document.getElementById('newQuoteCategory').value.trim();
 
   if (inputQuote && inputCategory) {
-      quotes.push({ text: inputQuote, category: inputCategory });
-      localStorage.setItem('quotes', JSON.stringify(quotes));
-      alert("New quote added");
-      reset();
-      showRandomQuote();
+      const newQuote = { title: inputQuote, body: inputCategory };
+
+      try {
+          // Send a POST request to the server
+          const response = await fetch("https://jsonplaceholder.typicode.com/posts", {
+              method: "POST",
+              headers: {
+                  "Content-Type": "application/json"
+              },
+              body: JSON.stringify(newQuote)
+          });
+
+          if (!response.ok) {
+              throw new Error('Network response was not ok');
+          }
+
+          const data = await response.json();
+          quotes.push({ text: data.title, category: data.body }); // Assuming the response returns the quote structure
+          localStorage.setItem('quotes', JSON.stringify(quotes));
+          alert("New quote added");
+          reset();
+          showRandomQuote();
+      } catch (error) {
+          console.error("Error adding quote:", error);
+          alert("Failed to add quote. Please try again.");
+      }
   } else {
       alert("Please fill in both the quote and category fields.");
   }

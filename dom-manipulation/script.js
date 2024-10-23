@@ -382,8 +382,13 @@ async function fetchQuotesFromServer() {
   }
 }
 
-// Periodically fetch data from the server
-setInterval(fetchQuotesFromServer, 10000);
+// Function to sync quotes with the server periodically
+function syncQuotes() {
+  fetchQuotesFromServer();
+}
+
+// Periodically fetch data from the server every 10 seconds
+setInterval(syncQuotes, 10000);
 
 // Populate categories dropdown
 function populateCategories() {

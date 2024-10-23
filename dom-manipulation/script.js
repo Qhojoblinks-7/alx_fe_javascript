@@ -321,19 +321,19 @@ function resolveConflictsAndMergeQuotes(serverQuotes) {
   const existingQuotesMap = new Map(quotes.map(quote => [quote.text, quote]));
 
   serverQuotes.forEach(serverQuote => {
-      if (existingQuotesMap.has(serverQuote.text)) {
+      if (existingQuotesMap.has(serverQuote.title)) { // Using serverQuote.title for comparison
           showNotification(
-              `Conflict detected for quote: "${serverQuote.text}".`,
+              `Conflict detected for quote: "${serverQuote.title}".`,
               () => {
-                  existingQuotesMap.set(serverQuote.text, serverQuote);
-                  showNotification(`Kept server version for: "${serverQuote.text}".`);
+                  existingQuotesMap.set(serverQuote.title, { text: serverQuote.title, category: serverQuote.body }); // Update with server data
+                  showNotification(`Kept server version for: "${serverQuote.title}".`);
               },
               () => {
-                  showNotification(`Kept local version for: "${serverQuote.text}".`);
+                  showNotification(`Kept local version for: "${serverQuote.title}".`);
               }
           );
       } else {
-          existingQuotesMap.set(serverQuote.text, serverQuote);
+          existingQuotesMap.set(serverQuote.title, { text: serverQuote.title, category: serverQuote.body }); // Add new quote from server
       }
   });
 
@@ -343,16 +343,22 @@ function resolveConflictsAndMergeQuotes(serverQuotes) {
 }
 
 // Simulated server interaction
-function fetchQuotesFromServer() {
-  const simulatedServerData = [
-      { text: "Believe you can and you're halfway there.", category: "Motivation" },
-      { text: "New quote from server!", category: "Inspiration" }
-  ];
+async function fetchQuotesFromServer() {
+  try {
+      const response = await fetch("https://jsonplaceholder.typicode.com/posts");
+      const data = await response.json();
+      
+      // Simulating server quotes using post titles and bodies
+      const serverQuotes = data.map(post => ({
+          title: post.title,
+          body: post.body // Using body as category
+      }));
 
-  // Simulate a delay for fetching data
-  setTimeout(() => {
-      resolveConflictsAndMergeQuotes(simulatedServerData);
-  }, 1000);
+      // Resolve conflicts with local data
+      resolveConflictsAndMergeQuotes(serverQuotes);
+  } catch (error) {
+      console.error("Error fetching data from server:", error);
+  }
 }
 
 // Periodically fetch data from the server
@@ -361,9 +367,9 @@ setInterval(fetchQuotesFromServer, 10000);
 // Populate categories dropdown
 function populateCategories() {
   const categoryFilter = document.getElementById('categoryFilter');
-  const uniqueCategory = [...new Set(quotes.map(quote => quote.category))];
+  const uniqueCategories = [...new Set(quotes.map(quote => quote.category))];
 
-  uniqueCategory.forEach(category => {
+  uniqueCategories.forEach(category => {
       const option = document.createElement('option');
       option.value = category;
       option.textContent = category;
